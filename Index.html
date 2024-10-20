@@ -1,0 +1,406 @@
+<html><head><base href="https://websim.ai/xiepex/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KFgart - Улыбнись Друг</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'VT323', monospace;
+    background-color: black;
+    color: #ff3333;
+    overflow: hidden;
+  }
+  #background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    transition: background-color 3s ease-in-out;
+  }
+  #content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding-top: 5vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+  #logo {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: neon 1.5s ease-in-out infinite alternate, fadeIn 2s ease-in-out 1s forwards;
+  }
+  #data-panel {
+    background-color: rgba(26, 26, 26, 0.9);
+    border: 2px solid #ff3333;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 80%;
+    max-width: 300px;
+    height: 60%;
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ff3333 #1a1a1a;
+  }
+  #data-panel::-webkit-scrollbar {
+    width: 4px;
+  }
+  #data-panel::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+  #data-panel::-webkit-scrollbar-thumb {
+    background-color: #ff3333;
+    border-radius: 10px;
+    border: 1px solid #1a1a1a;
+  }
+  .data-item {
+    margin-bottom: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 51, 51, 0.3);
+    padding-bottom: 0.5rem;
+  }
+  .data-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+    color: #ff9999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .data-value {
+    font-size: 1rem;
+    word-break: break-all;
+    color: #ff3333;
+  }
+  @keyframes neon {
+    from {
+      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff3333, 0 0 35px #ff3333, 0 0 40px #ff3333, 0 0 50px #ff3333, 0 0 75px #ff3333;
+    }
+    to {
+      text-shadow: 0 0 2.5px #fff, 0 0 5px #fff, 0 0 7.5px #fff, 0 0 10px #ff3333, 0 0 17.5px #ff3333, 0 0 20px #ff3333, 0 0 25px #ff3333, 0 0 37.5px #ff3333;
+    }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  #scroll-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    animation: bounce 1s infinite;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+    40% {transform: translateY(-10px) translateX(-50%);}
+    60% {transform: translateY(-5px) translateX(-50%);}
+  }
+  #timer-container {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(26, 26, 26, 0.8);
+    border: 2px solid #ff3333;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.8rem;
+    text-align: left;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+  }
+  #timer {
+    color: #ff9999;
+    font-weight: bold;
+  }
+  #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 3s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  #fsb-message {
+    font-size: 2.5rem;
+    color: #ff3333;
+    text-shadow: 0 0 10px #ff3333, 0 0 20px #ff3333, 0 0 30px #ff3333;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    text-align: center;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+</style>
+</head>
+<body>
+<div id="background"></div>
+<div id="content">
+  <div id="logo">Вы анти!<br> Ваши данные отправлены в систему <h1>KFgart</h1> </div>
+  <div id="data-panel"></div>
+  <div id="scroll-indicator">▼</div>
+</div>
+<div id="timer-container">
+  Данные отправлены в <a href="https://t.me/KFgart_system" target="_blank" style="color: #ff9999;">t.me/KFgart_system</a> через звезду смерти<br>
+  У вас <span id="timer">5</span> секунд чтобы покинуть сайт
+</div>
+<div id="overlay">
+  <div id="fsb-message">твои данные в системе KFgart, не будь против системы, иначе будет плохо</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  setTimeout(() => {
+    document.getElementById('background').style.backgroundColor = '#0a0a0a';
+  }, 1000);
+
+  setTimeout(() => {
+    fetchData();
+  }, 3000);
+});
+
+async function fetchData() {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    
+    const dataPanel = document.getElementById('data-panel');
+    const dataPoints = [
+      { label: 'IP-адрес', value: data.ip },
+      { label: 'Город', value: data.city },
+      { label: 'Регион', value: data.region },
+      { label: 'Страна', value: data.country_name },
+      { label: 'Часовой пояс', value: data.timezone },
+      { label: 'Провайдер', value: data.org },
+      { label: 'Широта', value: data.latitude },
+      { label: 'Долгота', value: data.longitude },
+      { label: 'Координаты', value: `${data.latitude}, ${data.longitude}` },
+      { label: 'Почтовый индекс', value: data.postal },
+      { label: 'Языки', value: data.languages },
+      { label: 'Валюта', value: data.currency_name },
+      { label: 'Код страны', value: data.country_calling_code },
+      { label: 'Континент', value: data.continent_code },
+      { label: 'Население страны', value: data.country_population },
+      { label: 'ASN', value: data.asn },
+      { label: 'Тип соединения', value: data.network ? 'Проводное' : 'Беспроводное' },
+    ];
+
+    dataPoints.forEach((point, index) => {
+      setTimeout(() => {
+        const item = document.createElement('div');
+        item.className = 'data-item';
+        item.innerHTML = `
+          <div class="data-label">${point.label}</div>
+          <div class="data-value">${point.value || 'Нет данных'}</div>
+        `;
+        dataPanel.appendChild(item);
+
+        if (index === dataPoints.length - 1) {
+          addExtraData();
+          startTimer();
+        }
+      }, index * 200);
+    });
+
+    dataPanel.style.opacity = '1';
+    setTimeout(() => {
+      document.getElementById('scroll-indicator').style.opacity = '1';
+    }, dataPoints.length * 200);
+
+  } catch (error) {
+    console.error('Ошибка при получении данных:', error);
+    document.getElementById('data-panel').innerHTML = '<div class="data-item">Произошла ошибка при получении данных.</div>';
+    document.getElementById('data-panel').style.opacity = '1';
+    startTimer();
+  }
+}
+
+function addExtraData() {
+  const dataPanel = document.getElementById('data-panel');
+
+  // Добавление информации о батарее
+  if ('getBattery' in navigator) {
+    navigator.getBattery().then(battery => {
+      const batteryItem = document.createElement('div');
+      batteryItem.className = 'data-item';
+      batteryItem.innerHTML = `
+        <div class="data-label">Заряд батареи</div>
+        <div class="data-value">${Math.round(battery.level * 100)}%</div>
+      `;
+      dataPanel.appendChild(batteryItem);
+    });
+  }
+
+  // Добавление информации о браузере и ОС
+  const userAgent = navigator.userAgent;
+  const browserInfo = document.createElement('div');
+  browserInfo.className = 'data-item';
+  browserInfo.innerHTML = `
+    <div class="data-label">Браузер</div>
+    <div class="data-value">${getBrowserInfo(userAgent)}</div>
+  `;
+  dataPanel.appendChild(browserInfo);
+
+  const osInfo = document.createElement('div');
+  osInfo.className = 'data-item';
+  osInfo.innerHTML = `
+    <div class="data-label">ОС</div>
+    <div class="data-value">${getOSInfo(userAgent)}</div>
+  `;
+  dataPanel.appendChild(osInfo);
+
+  // Добавление информации о размере экрана
+  const screenInfo = document.createElement('div');
+  screenInfo.className = 'data-item';
+  screenInfo.innerHTML = `
+    <div class="data-label">Экран</div>
+    <div class="data-value">${window.screen.width}x${window.screen.height}</div>
+  `;
+  dataPanel.appendChild(screenInfo);
+
+  // Добавление информации о языке браузера
+  const languageInfo = document.createElement('div');
+  languageInfo.className = 'data-item';
+  languageInfo.innerHTML = `
+    <div class="data-label">Язык браузера</div>
+    <div class="data-value">${navigator.language || navigator.userLanguage}</div>
+  `;
+  dataPanel.appendChild(languageInfo);
+
+  // Добавление информации о дате и времени
+  const dateTimeInfo = document.createElement('div');
+  dateTimeInfo.className = 'data-item';
+  dateTimeInfo.innerHTML = `
+    <div class="data-label">Дата и время</div>
+    <div class="data-value">${new Date().toLocaleString()}</div>
+  `;
+  dataPanel.appendChild(dateTimeInfo);
+
+  // Добавление информации о количестве ядер процессора
+  const cpuInfo = document.createElement('div');
+  cpuInfo.className = 'data-item';
+  cpuInfo.innerHTML = `
+    <div class="data-label">Количество ядер процессора</div>
+    <div class="data-value">${navigator.hardwareConcurrency || 'Неизвестно'}</div>
+  `;
+  dataPanel.appendChild(cpuInfo);
+
+  // Добавление информации о наличии тачскрина
+  const touchscreenInfo = document.createElement('div');
+  touchscreenInfo.className = 'data-item';
+  touchscreenInfo.innerHTML = `
+    <div class="data-label">Тачскрин</div>
+    <div class="data-value">${navigator.maxTouchPoints > 0 ? 'Да' : 'Нет'}</div>
+  `;
+  dataPanel.appendChild(touchscreenInfo);
+}
+
+function getBrowserInfo(userAgent) {
+  const browsers = [
+    {name: 'Chrome', regex: /Chrome\/([0-9.]+)/},
+    {name: 'Firefox', regex: /Firefox\/([0-9.]+)/},
+    {name: 'Safari', regex: /Version\/([0-9.]+).*Safari/},
+    {name: 'Opera', regex: /OPR\/([0-9.]+)/},
+    {name: 'Edge', regex: /Edg\/([0-9.]+)/},
+    {name: 'IE', regex: /MSIE ([0-9.]+)/}
+  ];
+
+  for (let browser of browsers) {
+    const match = userAgent.match(browser.regex);
+    if (match) return `${browser.name} ${match[1]}`;
+  }
+
+  return 'Неизвестный';
+}
+
+function getOSInfo(userAgent) {
+  const os = [
+    {name: 'Windows', regex: /Windows NT ([0-9.]+)/},
+    {name: 'Mac', regex: /Mac OS X ([0-9_]+)/},
+    {name: 'iOS', regex: /iPhone OS ([0-9_]+)/},
+    {name: 'Android', regex: /Android ([0-9.]+)/},
+    {name: 'Linux', regex: /Linux/}
+  ];
+
+  for (let system of os) {
+    const match = userAgent.match(system.regex);
+    if (match) return `${system.name} ${match[1] ? match[1].replace(/_/g, '.') : ''}`;
+  }
+
+  return 'Неизвестная';
+}
+
+document.getElementById('data-panel').addEventListener('scroll', function() {
+  const scrollIndicator = document.getElementById('scroll-indicator');
+  if (this.scrollTop + this.clientHeight >= this.scrollHeight - 20) {
+    scrollIndicator.style.opacity = '0';
+  } else {
+    scrollIndicator.style.opacity = '1';
+  }
+});
+
+function startTimer() {
+  let seconds = 15;
+  const timerElement = document.getElementById('timer');
+  const timerContainer = document.getElementById('timer-container');
+  
+  timerContainer.style.opacity = '1';
+  
+  const countDown = setInterval(() => {
+    seconds--;
+    timerElement.textContent = seconds;
+    
+    if (seconds <= 0) {
+      clearInterval(countDown);
+      showFSBMessage();
+    }
+  }, 1000);
+}
+
+function showFSBMessage() {
+  const overlay = document.getElementById('overlay');
+  const fsbMessage = document.getElementById('fsb-message');
+  
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
+  overlay.style.opacity = '1';
+  
+  setTimeout(() => {
+    fsbMessage.style.opacity = '1';
+  }, 1000);
+}
+</script>
+</body>
+</html>
